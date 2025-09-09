@@ -4,14 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter } from "lucide-react";
+import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter, Settings, User, CreditCard } from "lucide-react";
 import { ReservationsTable } from "@/components/dashboard/ReservationsTable";
 import { OrdersTable } from "@/components/dashboard/OrdersTable";
 import { StatsCards } from "@/components/dashboard/StatsCards";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("reservations");
   const [searchQuery, setSearchQuery] = useState("");
+  const { user, subscription } = useAuth();
+  const navigate = useNavigate();
+
+  const getPlanDisplayName = (tier: string | null) => {
+    switch (tier) {
+      case 'basic': return 'Plan Basic';
+      case 'pro': return 'Plan Pro';
+      case 'premium': return 'Plan Premium';
+      default: return 'Aucun plan';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,8 +37,11 @@ const Dashboard = () => {
                 <UtensilsCrossed className="h-8 w-8 text-primary" />
                 <h1 className="text-2xl font-bold text-foreground">mind.line</h1>
               </div>
-              <Badge variant="secondary" className="px-3 py-1">
-                Plan Pro
+              <Badge 
+                variant={subscription.subscribed ? "default" : "secondary"} 
+                className="px-3 py-1"
+              >
+                {getPlanDisplayName(subscription.subscription_tier)}
               </Badge>
             </div>
             
@@ -36,9 +52,33 @@ const Dashboard = () => {
                   3
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <span>Restaurant Le Bistro</span>
-              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/account')}
+                className="flex items-center space-x-2"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">{user?.email}</span>
+              </Button>
+              
+              {!subscription.subscribed && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => navigate('/pricing')}
+                  className="flex items-center space-x-2"
+                >
+                  <CreditCard className="h-4 w-4" />
+                  <span>Choisir un plan</span>
+                </Button>
+              )}
+              
+              <Settings 
+                className="h-6 w-6 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" 
+                onClick={() => navigate('/account')}
+              />
             </div>
           </div>
         </div>
