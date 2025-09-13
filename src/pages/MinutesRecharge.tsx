@@ -70,6 +70,7 @@ export default function MinutesRecharge() {
   const handlePurchase = async () => {
     if (!selectedPack || !user) return;
 
+    console.log('Starting purchase process...', { packType: selectedPack, userId: user.id });
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-minutes-checkout', {
@@ -79,16 +80,24 @@ export default function MinutesRecharge() {
         }
       });
 
-      if (error) throw error;
+      console.log('Supabase function response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        console.log('Redirecting to Stripe checkout:', data.url);
+        window.location.href = data.url; // Utiliser location.href au lieu de window.open
+      } else {
+        throw new Error('No checkout URL received from Stripe');
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de créer la session de paiement",
+        description: `Impossible de créer la session de paiement: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
         variant: "destructive"
       });
     } finally {
@@ -103,7 +112,7 @@ export default function MinutesRecharge() {
       <div className="container mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/minutes')}>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
