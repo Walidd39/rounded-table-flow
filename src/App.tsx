@@ -9,6 +9,7 @@ import { Auth } from "./pages/Auth";
 import { Pricing } from "./pages/Pricing";
 import { Account } from "./pages/Account";
 import { Success } from "./pages/Success";
+import { Confirm } from "./pages/Confirm";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ const App = () => (
                 <Auth />
               </PublicRoute>
             } />
+            <Route path="/confirm" element={<Confirm />} />
             <Route path="/pricing" element={
               <ProtectedRoute>
                 <Pricing />
