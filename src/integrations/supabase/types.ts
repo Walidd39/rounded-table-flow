@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      consommation: {
+        Row: {
+          created_at: string
+          date_appel: string
+          description: string | null
+          id: string
+          minutes_utilisees: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_appel?: string
+          description?: string | null
+          id?: string
+          minutes_utilisees: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_appel?: string
+          description?: string | null
+          id?: string
+          minutes_utilisees?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -64,29 +91,77 @@ export type Database = {
       }
       profiles: {
         Row: {
+          auto_recharge_enabled: boolean
+          auto_recharge_threshold: number
           avatar_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
           id: string
+          minutes_restantes: number
+          preferred_pack_type: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          auto_recharge_enabled?: boolean
+          auto_recharge_threshold?: number
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          minutes_restantes?: number
+          preferred_pack_type?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          auto_recharge_enabled?: boolean
+          auto_recharge_threshold?: number
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
+          minutes_restantes?: number
+          preferred_pack_type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recharges: {
+        Row: {
+          created_at: string
+          id: string
+          minutes: number
+          pack_type: string
+          prix: number
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          minutes: number
+          pack_type: string
+          prix: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          minutes?: number
+          pack_type?: string
+          prix?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -175,7 +250,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_minutes_to_user: {
+        Args: { minutes_to_add: number; user_id_param: string }
+        Returns: undefined
+      }
+      consume_minutes: {
+        Args: {
+          description_param?: string
+          minutes_consumed: number
+          user_id_param: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
