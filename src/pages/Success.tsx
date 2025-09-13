@@ -4,12 +4,14 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/contexts/NotificationContext';
 import { useToast } from '@/hooks/use-toast';
 
 export const Success: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { checkSubscription } = useAuth();
+  const { addNotification } = useNotifications();
   const { toast } = useToast();
   const sessionId = searchParams.get('session_id');
 
@@ -18,6 +20,14 @@ export const Success: React.FC = () => {
     const refreshSubscription = async () => {
       try {
         await checkSubscription();
+        
+        // Add notification for subscription success
+        addNotification({
+          title: "Souscription confirmée !",
+          message: "🎉 Merci pour votre souscription ! Votre compte sera configuré et prêt à utiliser sous 3 à 4 jours. Nous vous tiendrons informé.",
+          type: "success"
+        });
+        
         toast({
           title: "Abonnement activé",
           description: "Votre abonnement a été activé avec succès !",
@@ -31,7 +41,7 @@ export const Success: React.FC = () => {
       // Wait a moment for Stripe to process, then refresh
       setTimeout(refreshSubscription, 2000);
     }
-  }, [sessionId, checkSubscription]);
+  }, [sessionId, checkSubscription, addNotification]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

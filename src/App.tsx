@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import Dashboard from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
 import { Pricing } from "./pages/Pricing";
@@ -57,52 +58,54 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/auth" element={
-              <PublicRoute>
-                <Auth />
-              </PublicRoute>
-            } />
-            <Route path="/confirm" element={<Confirm />} />
-            <Route path="/pricing" element={
-              <ProtectedRoute>
-                <Pricing />
-              </ProtectedRoute>
-            } />
-            <Route path="/account" element={
-              <ProtectedRoute>
-                <Account />
-              </ProtectedRoute>
-            } />
-            <Route path="/success" element={
-              <ProtectedRoute>
-                <Success />
-              </ProtectedRoute>
-            } />
-            <Route path="/minutes" element={
-              <ProtectedRoute>
-                <Minutes />
-              </ProtectedRoute>
-            } />
-            <Route path="/minutes/recharge" element={
-              <ProtectedRoute>
-                <MinutesRecharge />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <NotificationProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/auth" element={
+                <PublicRoute>
+                  <Auth />
+                </PublicRoute>
+              } />
+              <Route path="/confirm" element={<Confirm />} />
+              <Route path="/pricing" element={
+                <ProtectedRoute>
+                  <Pricing />
+                </ProtectedRoute>
+              } />
+              <Route path="/account" element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              } />
+              <Route path="/success" element={
+                <ProtectedRoute>
+                  <Success />
+                </ProtectedRoute>
+              } />
+              <Route path="/minutes" element={
+                <ProtectedRoute>
+                  <Minutes />
+                </ProtectedRoute>
+              } />
+              <Route path="/minutes/recharge" element={
+                <ProtectedRoute>
+                  <MinutesRecharge />
+                </ProtectedRoute>
+              } />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </NotificationProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

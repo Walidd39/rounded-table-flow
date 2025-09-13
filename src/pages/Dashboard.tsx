@@ -10,6 +10,7 @@ import { OrdersTable } from "@/components/dashboard/OrdersTable";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("reservations");
@@ -49,12 +50,7 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Bell className="h-6 w-6 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
-                <Badge className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary">
-                  3
-                </Badge>
-              </div>
+              <NotificationDropdown />
               
               <Button
                 variant="ghost"
