@@ -38,7 +38,7 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    // Parse request body
+    // Parse request body first
     const body = await req.json();
     const { packType, userId } = body;
     logStep("Request body parsed", { packType, userId });
@@ -50,17 +50,22 @@ serve(async (req) => {
     const packDetails = PACK_DETAILS[packType as keyof typeof PACK_DETAILS];
     logStep("Pack selected", { packType, packDetails });
 
-    // Get user from Authorization header
+    // Get user from Authorization header using ANON key for JWT validation
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: { Authorization: authHeader }
+        }
+      }
     );
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    // Verify user authentication
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser();
     if (userError) {
       logStep("Auth error", { error: userError.message });
       throw new Error(`Authentication error: ${userError.message}`);
@@ -87,7 +92,7 @@ serve(async (req) => {
       // Continue without customer ID
     }
 
-    const origin = req.headers.get("origin") || "https://id-preview--cb9c56c0-bbe1-421a-ba2a-b581cf1bc264.lovable.app";
+    const origin = req.headers.get("origin") || "https://cb9c56c0-bbe1-421a-ba2a-b581cf1bc264.sandbox.lovable.dev";
     logStep("Creating checkout session", { origin });
     
     const session = await stripe.checkout.sessions.create({
