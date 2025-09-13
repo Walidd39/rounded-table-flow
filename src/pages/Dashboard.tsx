@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter, Settings, User, CreditCard } from "lucide-react";
+import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter, Settings, User, CreditCard, Zap } from "lucide-react";
 import { ReservationsTable } from "@/components/dashboard/ReservationsTable";
 import { OrdersTable } from "@/components/dashboard/OrdersTable";
 import { StatsCards } from "@/components/dashboard/StatsCards";
@@ -52,6 +52,16 @@ const Dashboard = () => {
                   3
                 </Badge>
               </div>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/minutes')}
+                className="relative"
+                title="Mes Minutes"
+              >
+                <Zap className="h-5 w-5 text-muted-foreground" />
+              </Button>
               
               <Button
                 variant="ghost"

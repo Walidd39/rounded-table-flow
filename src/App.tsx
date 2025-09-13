@@ -10,6 +10,8 @@ import { Pricing } from "./pages/Pricing";
 import { Account } from "./pages/Account";
 import { Success } from "./pages/Success";
 import { Confirm } from "./pages/Confirm";
+import Minutes from "./pages/Minutes";
+import MinutesRecharge from "./pages/MinutesRecharge";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -84,6 +86,16 @@ const App = () => (
             <Route path="/success" element={
               <ProtectedRoute>
                 <Success />
+              </ProtectedRoute>
+            } />
+            <Route path="/minutes" element={
+              <ProtectedRoute>
+                <Minutes />
+              </ProtectedRoute>
+            } />
+            <Route path="/minutes/recharge" element={
+              <ProtectedRoute>
+                <MinutesRecharge />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
