@@ -17,12 +17,6 @@ const Dashboard = () => {
   const { user, subscription } = useAuth();
   const navigate = useNavigate();
 
-  console.log('🏠 Dashboard component rendered', { 
-    user: user?.email, 
-    subscription: subscription.subscribed,
-    currentPath: window.location.pathname 
-  });
-
   const getPlanDisplayName = (tier: string | null) => {
     switch (tier) {
       case 'basic': return 'Plan Basic';
@@ -34,11 +28,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Debug info */}
-      <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 text-center">
-        🚧 DEBUG: Dashboard chargé - User: {user?.email} - Path: {window.location.pathname}
-      </div>
-      
       {/* Header */}
       <header className="border-b bg-card shadow-soft">
         <div className="container mx-auto px-6 py-4">
