@@ -76,6 +76,21 @@ serve(async (req) => {
         return new Response("Failed to add minutes", { status: 500 });
       }
 
+      // Add notification for successful recharge
+      const { error: notificationError } = await supabaseClient
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          title: "Recharge effectuée !",
+          message: `🔋 Votre recharge de ${minutes} minutes a été effectuée avec succès ! Vos minutes sont maintenant disponibles.`,
+          type: 'success'
+        });
+
+      if (notificationError) {
+        logStep("WARNING: Failed to create notification", { error: notificationError });
+        // Don't fail the whole process for notification error
+      }
+
       logStep("Successfully processed payment", {
         rechargeId,
         userId,

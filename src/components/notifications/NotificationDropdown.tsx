@@ -30,10 +30,17 @@ const getNotificationIcon = (type: string) => {
 };
 
 export const NotificationDropdown: React.FC = () => {
-  const { notifications, unreadCount, markAsRead, clearNotification } = useNotifications();
+  const { notifications, unreadCount, markAsRead, clearNotification, refreshNotifications } = useNotifications();
+
+  // Refresh notifications when component mounts or when dropdown opens
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      refreshNotifications();
+    }
+  };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
