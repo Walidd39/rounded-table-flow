@@ -1,5 +1,6 @@
 import React from 'react';
 import { PricingPlans } from '@/components/subscription/PricingPlans';
+import { MinutesRecharge } from '@/components/minutes/MinutesRecharge';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +31,11 @@ export const Pricing: React.FC = () => {
         </div>
         
         <PricingPlans />
+        
+        {/* Section recharge des minutes */}
+        <div className="mt-16 border-t pt-12">
+          <MinutesRecharge />
+        </div>
       </div>
     </div>
   );
