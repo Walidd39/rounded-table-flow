@@ -17,6 +17,9 @@ const Dashboard = () => {
   const { user, subscription } = useAuth();
   const navigate = useNavigate();
 
+  // Debug: vérifier si le composant se charge
+  console.log("Dashboard chargé !", { user, subscription });
+
   const getPlanDisplayName = (tier: string | null) => {
     switch (tier) {
       case 'basic': return 'Plan Basic';
