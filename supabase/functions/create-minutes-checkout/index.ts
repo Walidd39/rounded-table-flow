@@ -31,11 +31,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
-
   try {
     logStep("Function started");
 
@@ -43,18 +38,11 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    // Parse request body
+    const body = await req.json();
+    const { packType, userId } = body;
+    logStep("Request body parsed", { packType, userId });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
-
-    const { packType, userId } = await req.json();
     if (!packType || !PACK_DETAILS[packType as keyof typeof PACK_DETAILS]) {
       throw new Error("Invalid pack type selected");
     }
@@ -62,35 +50,45 @@ serve(async (req) => {
     const packDetails = PACK_DETAILS[packType as keyof typeof PACK_DETAILS];
     logStep("Pack selected", { packType, packDetails });
 
-    // Create recharge record in database
-    const { data: rechargeData, error: rechargeError } = await supabaseClient
-      .from('recharges')
-      .insert({
-        user_id: userId,
-        pack_type: packType,
-        minutes: packDetails.minutes,
-        prix: packDetails.price,
-        status: 'pending'
-      })
-      .select()
-      .single();
+    // Get user from Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header provided");
 
-    if (rechargeError) throw rechargeError;
-    logStep("Recharge record created", { rechargeId: rechargeData.id });
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) {
+      logStep("Auth error", { error: userError.message });
+      throw new Error(`Authentication error: ${userError.message}`);
+    }
+    
+    const user = userData.user;
+    if (!user?.email) throw new Error("User not authenticated or email not available");
+    logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     // Check if customer exists
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Existing customer found", { customerId });
-    } else {
-      logStep("No existing customer found");
+    try {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        logStep("Existing customer found", { customerId });
+      } else {
+        logStep("No existing customer found");
+      }
+    } catch (stripeError) {
+      logStep("Error finding customer", { error: stripeError });
+      // Continue without customer ID
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const origin = req.headers.get("origin") || "https://id-preview--cb9c56c0-bbe1-421a-ba2a-b581cf1bc264.lovable.app";
+    logStep("Creating checkout session", { origin });
     
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -109,25 +107,18 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${origin}/minutes?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/minutes/recharge?payment=cancelled`,
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pricing`,
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       metadata: {
-        recharge_id: rechargeData.id,
         user_id: userId,
         pack_type: packType,
         minutes: packDetails.minutes.toString()
       }
     });
 
-    // Update recharge with Stripe session ID
-    await supabaseClient
-      .from('recharges')
-      .update({ stripe_payment_intent_id: session.id })
-      .eq('id', rechargeData.id);
-
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created successfully", { sessionId: session.id, url: session.url });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -136,8 +127,17 @@ serve(async (req) => {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-minutes-checkout", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    logStep("ERROR in create-minutes-checkout", { 
+      message: errorMessage, 
+      stack: errorStack,
+      name: error instanceof Error ? error.name : 'Unknown'
+    });
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      details: error instanceof Error ? error.name : 'Unknown error type'
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
