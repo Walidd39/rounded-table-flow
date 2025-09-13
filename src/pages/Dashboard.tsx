@@ -56,11 +56,14 @@ const Dashboard = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate('/minutes')}
-                className="relative"
+                onClick={() => {
+                  console.log('Navigating to /minutes');
+                  navigate('/minutes');
+                }}
+                className="relative bg-red-100 border-2 border-red-500"
                 title="Mes Minutes"
               >
-                <Zap className="h-5 w-5 text-muted-foreground" />
+                <Zap className="h-5 w-5 text-red-600" />
               </Button>
               
               <Button
