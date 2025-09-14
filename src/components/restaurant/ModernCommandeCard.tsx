@@ -138,7 +138,7 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-56 bg-background border shadow-lg z-50">
               {hasNextStatus && 'nextStatus' in config && (
                 <DropdownMenuItem 
                   onClick={() => updateStatus(config.nextStatus)}

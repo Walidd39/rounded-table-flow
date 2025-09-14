@@ -127,7 +127,7 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-48 bg-background border shadow-lg z-50">
                 {reservation.statut === 'confirmee' && (
                   <DropdownMenuItem 
                     onClick={() => updateStatus('arrivee')}

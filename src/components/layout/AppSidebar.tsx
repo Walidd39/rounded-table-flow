@@ -232,8 +232,8 @@ export function AppSidebar() {
             {/* Minutes Remaining */}
             <div className="p-3 rounded-xl bg-warning/10 border border-warning/20">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-warning-foreground">Minutes restantes</span>
-                <Badge variant="outline" className="bg-warning/20 text-warning-foreground border-warning/30">
+                <span className="text-xs font-medium text-foreground">Minutes restantes</span>
+                <Badge variant="outline" className="bg-warning/20 text-foreground border-warning/30">
                   0
                 </Badge>
               </div>
