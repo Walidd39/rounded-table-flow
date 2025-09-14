@@ -147,7 +147,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-5 w-5" />
-                      {open && <span className="font-medium">{item.title}</span>}
+                      <span className="font-medium">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -168,7 +168,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-5 w-5" />
-                      {open && <span className="font-medium">{item.title}</span>}
+                      <span className="font-medium">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -189,16 +189,14 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-5 w-5" />
-                      {open && (
-                        <div className="flex items-center justify-between w-full">
-                          <span className="font-medium">{item.title}</span>
-                          {item.badge === "urgent" && (
-                            <Badge variant="destructive" className="ml-2 px-1 py-0 text-xs">
-                              !
-                            </Badge>
-                          )}
-                        </div>
-                      )}
+                      <div className="flex items-center justify-between w-full">
+                        <span className="font-medium">{item.title}</span>
+                        {item.badge === "urgent" && (
+                          <Badge variant="destructive" className="ml-2 px-1 py-0 text-xs">
+                            !
+                          </Badge>
+                        )}
+                      </div>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

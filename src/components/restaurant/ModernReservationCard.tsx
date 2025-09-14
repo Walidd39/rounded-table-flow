@@ -57,17 +57,21 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
   const updateStatus = async (newStatus: string) => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      console.log('Updating reservation status:', { id: reservation.id, newStatus });
+      
+      const { data, error } = await supabase
         .from('ai_reservations')
         .update({ statut: newStatus })
-        .eq('id', reservation.id);
+        .eq('id', reservation.id)
+        .select();
 
       if (error) {
-        toast.error("Erreur lors de la mise à jour du statut");
-        console.error('Error updating reservation status:', error);
+        console.error('Supabase error:', error);
+        toast.error(`Erreur lors de la mise à jour du statut: ${error.message}`);
         return;
       }
 
+      console.log('Update successful:', data);
       toast.success(`Statut mis à jour: ${statusConfig[newStatus as keyof typeof statusConfig]?.label}`);
       onUpdate();
     } catch (error) {
