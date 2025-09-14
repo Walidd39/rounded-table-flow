@@ -127,10 +127,22 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
               </Badge>
               <Badge 
                 variant={config.variant}
-                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1`}
+                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity ${
+                  hasNextStatus ? 'hover:scale-105' : ''
+                }`}
+                onClick={() => {
+                  if (hasNextStatus && 'nextStatus' in config) {
+                    console.log('🖱️ Status badge clicked!', { currentStatus: commande.statut, nextStatus: config.nextStatus });
+                    updateStatus(config.nextStatus);
+                  }
+                }}
+                title={hasNextStatus && 'nextStatus' in config ? `Cliquer pour ${config.nextLabel.toLowerCase()}` : undefined}
               >
                 <StatusIcon className="h-3 w-3" />
                 {config.label}
+                {hasNextStatus && 'nextStatus' in config && (
+                  <span className="ml-1 text-xs opacity-70">→</span>
+                )}
               </Badge>
             </div>
           </div>

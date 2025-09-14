@@ -118,10 +118,23 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
           <div className="flex items-center gap-2">
             <Badge 
               variant={config.variant}
-              className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1`}
+              className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 cursor-pointer hover:opacity-80 transition-all hover:scale-105`}
+              onClick={() => {
+                console.log('🖱️ Reservation status badge clicked!', { currentStatus: reservation.statut });
+                if (reservation.statut === 'confirmee') {
+                  updateStatus('arrivee');
+                } else if (reservation.statut === 'arrivee') {
+                  // Optionnel: pas d'action suivante ou revenir à confirmée
+                  console.log('Réservation déjà arrivée');
+                }
+              }}
+              title={reservation.statut === 'confirmee' ? 'Cliquer pour marquer comme arrivée' : undefined}
             >
               <StatusIcon className="h-3 w-3" />
               {config.label}
+              {reservation.statut === 'confirmee' && (
+                <span className="ml-1 text-xs opacity-70">→</span>
+              )}
             </Badge>
             
             <DropdownMenu>
