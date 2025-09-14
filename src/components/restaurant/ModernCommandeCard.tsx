@@ -65,6 +65,13 @@ const statusConfig = {
 
 export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Debug: vérifier si le composant se charge
+  console.log('🔍 ModernCommandeCard rendered with:', { 
+    id: commande.id, 
+    statut: commande.statut, 
+    client: commande.client_nom 
+  });
 
   const updateStatus = async (newStatus: string) => {
     console.log('🔄 updateStatus called with:', { newStatus, commandeId: commande.id, currentStatus: commande.statut });

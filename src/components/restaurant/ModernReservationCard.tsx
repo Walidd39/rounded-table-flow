@@ -53,6 +53,13 @@ const statusConfig = {
 
 export function ModernReservationCard({ reservation, onUpdate }: ModernReservationCardProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Debug: vérifier si le composant se charge
+  console.log('🔍 ModernReservationCard rendered with:', { 
+    id: reservation.id, 
+    statut: reservation.statut, 
+    client: reservation.client_nom 
+  });
 
   const updateStatus = async (newStatus: string) => {
     console.log('🔄 updateStatus called for reservation:', { newStatus, reservationId: reservation.id, currentStatus: reservation.statut });
