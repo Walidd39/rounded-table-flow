@@ -67,9 +67,11 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
   const [isUpdating, setIsUpdating] = useState(false);
 
   const updateStatus = async (newStatus: string) => {
+    console.log('🔄 updateStatus called with:', { newStatus, commandeId: commande.id, currentStatus: commande.statut });
     setIsUpdating(true);
+    
     try {
-      console.log('Updating order status:', { id: commande.id, newStatus });
+      console.log('🔍 About to update order in database...');
       
       const { data, error } = await supabase
         .from('ai_commandes')
@@ -77,17 +79,19 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
         .eq('id', commande.id)
         .select();
 
+      console.log('📡 Supabase response:', { data, error });
+
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('❌ Supabase error:', error);
         toast.error(`Erreur lors de la mise à jour du statut: ${error.message}`);
         return;
       }
 
-      console.log('Update successful:', data);
+      console.log('✅ Update successful:', data);
       toast.success(`Statut mis à jour: ${statusConfig[newStatus as keyof typeof statusConfig]?.label}`);
       onUpdate();
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error('💥 Unexpected error:', error);
       toast.error("Erreur lors de la mise à jour");
     } finally {
       setIsUpdating(false);
