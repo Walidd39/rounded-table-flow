@@ -14,6 +14,8 @@ import { Confirm } from "./pages/Confirm";
 import Minutes from "./pages/Minutes";
 import MinutesRecharge from "./pages/MinutesRecharge";
 import AdminDashboard from "./pages/AdminDashboard";
+import RestaurantDashboard from "./pages/RestaurantDashboard";
+import MenuManagement from "./pages/MenuManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -104,6 +106,16 @@ const App = () => (
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/restaurant-dashboard" element={
+                <ProtectedRoute>
+                  <RestaurantDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/menu-management" element={
+                <ProtectedRoute>
+                  <MenuManagement />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

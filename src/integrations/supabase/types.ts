@@ -50,6 +50,100 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_commandes: {
+        Row: {
+          client_nom: string
+          created_at: string
+          heure_commande: string
+          id: string
+          items_commandes: Json
+          montant_total: number
+          restaurant_id: string
+          statut: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_nom: string
+          created_at?: string
+          heure_commande: string
+          id?: string
+          items_commandes: Json
+          montant_total?: number
+          restaurant_id: string
+          statut?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_nom?: string
+          created_at?: string
+          heure_commande?: string
+          id?: string
+          items_commandes?: Json
+          montant_total?: number
+          restaurant_id?: string
+          statut?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_commandes_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      ai_reservations: {
+        Row: {
+          client_nom: string
+          client_telephone: string | null
+          confirmation: boolean | null
+          created_at: string
+          date_reservation: string
+          heure_reservation: string
+          id: string
+          nombre_personnes: number
+          restaurant_id: string
+          statut: string | null
+          updated_at: string
+        }
+        Insert: {
+          client_nom: string
+          client_telephone?: string | null
+          confirmation?: boolean | null
+          created_at?: string
+          date_reservation: string
+          heure_reservation: string
+          id?: string
+          nombre_personnes: number
+          restaurant_id: string
+          statut?: string | null
+          updated_at?: string
+        }
+        Update: {
+          client_nom?: string
+          client_telephone?: string | null
+          confirmation?: boolean | null
+          created_at?: string
+          date_reservation?: string
+          heure_reservation?: string
+          id?: string
+          nombre_personnes?: number
+          restaurant_id?: string
+          statut?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_reservations_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       consommation: {
         Row: {
           created_at: string
@@ -76,6 +170,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      menus_prix: {
+        Row: {
+          categorie: string | null
+          created_at: string
+          disponible: boolean | null
+          id: string
+          nom_plat: string
+          prix: number
+          restaurant_id: string
+          updated_at: string
+        }
+        Insert: {
+          categorie?: string | null
+          created_at?: string
+          disponible?: boolean | null
+          id?: string
+          nom_plat: string
+          prix: number
+          restaurant_id: string
+          updated_at?: string
+        }
+        Update: {
+          categorie?: string | null
+          created_at?: string
+          disponible?: boolean | null
+          id?: string
+          nom_plat?: string
+          prix?: number
+          restaurant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menus_prix_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       notifications: {
         Row: {

@@ -1,6 +1,6 @@
 project_id = "ezqiyuqqxuhkbhwrpaoz"
 
-[functions.stripe-webhook]
+[functions.webhook-receiver]
 verify_jwt = false
 
 [functions.stripe-minutes-webhook]
