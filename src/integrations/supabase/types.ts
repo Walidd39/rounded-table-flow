@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_metrics: {
+        Row: {
+          agents_delivered_count: number | null
+          agents_in_progress_count: number | null
+          average_creation_time_hours: number | null
+          created_at: string
+          date: string
+          id: string
+          monthly_revenue: number | null
+          new_clients_count: number | null
+          total_minutes_consumed: number | null
+        }
+        Insert: {
+          agents_delivered_count?: number | null
+          agents_in_progress_count?: number | null
+          average_creation_time_hours?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          monthly_revenue?: number | null
+          new_clients_count?: number | null
+          total_minutes_consumed?: number | null
+        }
+        Update: {
+          agents_delivered_count?: number | null
+          agents_in_progress_count?: number | null
+          average_creation_time_hours?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          monthly_revenue?: number | null
+          new_clients_count?: number | null
+          total_minutes_consumed?: number | null
+        }
+        Relationships: []
+      }
       consommation: {
         Row: {
           created_at: string
@@ -129,12 +165,17 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          cuisine_type: string | null
           display_name: string | null
           id: string
           minutes_restantes: number
           preferred_pack_type: string | null
+          restaurant_address: string | null
+          restaurant_name: string | null
+          restaurant_phone: string | null
           updated_at: string
           user_id: string
+          user_role: Database["public"]["Enums"]["user_role"] | null
         }
         Insert: {
           auto_recharge_enabled?: boolean
@@ -142,12 +183,17 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          cuisine_type?: string | null
           display_name?: string | null
           id?: string
           minutes_restantes?: number
           preferred_pack_type?: string | null
+          restaurant_address?: string | null
+          restaurant_name?: string | null
+          restaurant_phone?: string | null
           updated_at?: string
           user_id: string
+          user_role?: Database["public"]["Enums"]["user_role"] | null
         }
         Update: {
           auto_recharge_enabled?: boolean
@@ -155,12 +201,17 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          cuisine_type?: string | null
           display_name?: string | null
           id?: string
           minutes_restantes?: number
           preferred_pack_type?: string | null
+          restaurant_address?: string | null
+          restaurant_name?: string | null
+          restaurant_phone?: string | null
           updated_at?: string
           user_id?: string
+          user_role?: Database["public"]["Enums"]["user_role"] | null
         }
         Relationships: []
       }
@@ -278,6 +329,65 @@ export type Database = {
         }
         Relationships: []
       }
+      vocal_agents: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          cuisine_type: string | null
+          id: string
+          notes: string | null
+          priority: string
+          promised_delivery_date: string | null
+          restaurant_address: string | null
+          restaurant_id: string
+          restaurant_name: string
+          restaurant_phone: string | null
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          cuisine_type?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          promised_delivery_date?: string | null
+          restaurant_address?: string | null
+          restaurant_id: string
+          restaurant_name: string
+          restaurant_phone?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          cuisine_type?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          promised_delivery_date?: string | null
+          restaurant_address?: string | null
+          restaurant_id?: string
+          restaurant_name?: string
+          restaurant_phone?: string | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vocal_agents_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -297,7 +407,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -424,6 +534,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "user"],
+    },
   },
 } as const

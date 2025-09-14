@@ -13,6 +13,7 @@ import { Success } from "./pages/Success";
 import { Confirm } from "./pages/Confirm";
 import Minutes from "./pages/Minutes";
 import MinutesRecharge from "./pages/MinutesRecharge";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -98,6 +99,11 @@ const App = () => (
               <Route path="/minutes/recharge" element={
                 <ProtectedRoute>
                   <MinutesRecharge />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
