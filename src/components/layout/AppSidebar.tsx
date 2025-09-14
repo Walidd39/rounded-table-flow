@@ -145,7 +145,10 @@ export function AppSidebar() {
               {mainNavItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink 
+                      to={item.url} 
+                      className={({ isActive }) => getNavCls({ isActive })}
+                    >
                       <item.icon className="h-5 w-5" />
                       <span className="font-medium">{item.title}</span>
                     </NavLink>
@@ -166,7 +169,10 @@ export function AppSidebar() {
               {restaurantItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink 
+                      to={item.url} 
+                      className={({ isActive }) => getNavCls({ isActive })}
+                    >
                       <item.icon className="h-5 w-5" />
                       <span className="font-medium">{item.title}</span>
                     </NavLink>
@@ -187,7 +193,10 @@ export function AppSidebar() {
               {accountItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
+                    <NavLink 
+                      to={item.url} 
+                      className={({ isActive }) => getNavCls({ isActive })}
+                    >
                       <item.icon className="h-5 w-5" />
                       <div className="flex items-center justify-between w-full">
                         <span className="font-medium">{item.title}</span>
