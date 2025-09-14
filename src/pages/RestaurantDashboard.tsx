@@ -3,8 +3,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DashboardStats } from "@/components/restaurant/DashboardStats";
-import { ReservationCard } from "@/components/restaurant/ReservationCard";
-import { CommandeCard } from "@/components/restaurant/CommandeCard";
+import { ModernReservationCard } from "@/components/restaurant/ModernReservationCard";
+import { ModernCommandeCard } from "@/components/restaurant/ModernCommandeCard";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -139,102 +140,138 @@ export default function RestaurantDashboard() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Navigation Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Retour au Dashboard
-        </Button>
-        <Button 
-          variant="outline" 
-          onClick={() => navigate('/menu-management')}
-          className="flex items-center gap-2"
-        >
-          <Book className="h-4 w-4" />
-          Gestion du Menu
-        </Button>
-      </div>
-      
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Dashboard Restaurant</h1>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Bell className="h-3 w-3" />
-            {reservations.length + commandes.length} notifications
-          </Badge>
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="h-4 w-4 mr-1" />
-            Actualiser
-          </Button>
+    <AppLayout>
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Book className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Dashboard Restaurant</h1>
+                <p className="text-muted-foreground">
+                  Gérez vos réservations et commandes IA en temps réel
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/dashboard')}
+                className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border-border/50 hover:bg-accent/50"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour au Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/menu-management')}
+                className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border-border/50 hover:bg-accent/50"
+              >
+                <Book className="h-4 w-4" />
+                Gestion du Menu
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="flex items-center gap-2 bg-card/50 backdrop-blur-sm border-border/50 px-4 py-2">
+              <Bell className="h-4 w-4" />
+              {reservations.length + commandes.length} notifications
+            </Badge>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRefresh}
+              className="bg-card/50 backdrop-blur-sm border-border/50 hover:bg-accent/50"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Actualiser
+            </Button>
+          </div>
+        </div>
+
+        <DashboardStats stats={stats} />
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Réservations Section */}
+          <Card className="card-modern">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center justify-between text-xl">
+                <span>Réservations du jour</span>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30 font-semibold px-3">
+                  {reservations.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                    <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <span className="text-muted-foreground">Chargement des réservations...</span>
+                  </div>
+                </div>
+              ) : reservations.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="h-16 w-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4">
+                    <Bell className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Aucune réservation pour aujourd'hui</p>
+                </div>
+              ) : (
+                reservations.map((reservation) => (
+                  <ModernReservationCard 
+                    key={reservation.id} 
+                    reservation={reservation} 
+                    onUpdate={fetchData}
+                  />
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Commandes Section */}
+          <Card className="card-modern">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center justify-between text-xl">
+                <span>Commandes du jour</span>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/30 font-semibold px-3">
+                  {commandes.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3">
+                    <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    <span className="text-muted-foreground">Chargement des commandes...</span>
+                  </div>
+                </div>
+              ) : commandes.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="h-16 w-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4">
+                    <Bell className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Aucune commande pour aujourd'hui</p>
+                </div>
+              ) : (
+                commandes.map((commande) => (
+                  <ModernCommandeCard 
+                    key={commande.id} 
+                    commande={commande} 
+                    onUpdate={fetchData}
+                  />
+                ))
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      <DashboardStats stats={stats} />
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Réservations Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Réservations du jour</span>
-              <Badge variant="secondary">{reservations.length}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Chargement des réservations...
-              </div>
-            ) : reservations.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Aucune réservation pour aujourd'hui
-              </div>
-            ) : (
-              reservations.map((reservation) => (
-                <ReservationCard 
-                  key={reservation.id} 
-                  reservation={reservation} 
-                  onUpdate={fetchData}
-                />
-              ))
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Commandes Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Commandes du jour</span>
-              <Badge variant="secondary">{commandes.length}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Chargement des commandes...
-              </div>
-            ) : commandes.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Aucune commande pour aujourd'hui
-              </div>
-            ) : (
-              commandes.map((commande) => (
-                <CommandeCard 
-                  key={commande.id} 
-                  commande={commande} 
-                  onUpdate={fetchData}
-                />
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    </AppLayout>
   );
 }

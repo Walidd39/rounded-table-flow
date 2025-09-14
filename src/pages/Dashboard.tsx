@@ -4,22 +4,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter, Settings, User, CreditCard, Zap, ChefHat, Book } from "lucide-react";
+import { Calendar, Search, Filter, ChefHat, Book, BarChart3, Sparkles } from "lucide-react";
 import { ReservationsTable } from "@/components/dashboard/ReservationsTable";
 import { OrdersTable } from "@/components/dashboard/OrdersTable";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("reservations");
   const [searchQuery, setSearchQuery] = useState("");
   const { user, subscription } = useAuth();
   const navigate = useNavigate();
-
-  // Debug: vérifier si le composant se charge
-  console.log("Dashboard chargé !", { user, subscription });
 
   const getPlanDisplayName = (tier: string | null) => {
     switch (tier) {
@@ -31,105 +28,85 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card shadow-soft">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <UtensilsCrossed className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold text-foreground">mind.line</h1>
-              </div>
-              <Badge 
-                variant={subscription.subscribed ? "default" : "secondary"} 
-                className="px-3 py-1"
-              >
-                {getPlanDisplayName(subscription.subscription_tier)}
-              </Badge>
+    <AppLayout>
+      <div className="p-6 space-y-6">
+        {/* Welcome Header */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <BarChart3 className="h-6 w-6 text-primary" />
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <NotificationDropdown />
-              
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  console.log('Navigating to /minutes');
-                  navigate('/minutes');
-                }}
-                className="relative bg-red-100 border-2 border-red-500"
-                title="Mes Minutes"
-              >
-                <Zap className="h-5 w-5 text-red-600" />
-              </Button>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/account')}
-                className="flex items-center space-x-2"
-              >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">{user?.email}</span>
-              </Button>
-              
-              {!subscription.subscribed && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => navigate('/pricing')}
-                  className="flex items-center space-x-2"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  <span>Choisir un plan</span>
-                </Button>
-              )}
-              
-              <Settings 
-                className="h-6 w-6 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" 
-                onClick={() => navigate('/account')}
-              />
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+              <p className="text-muted-foreground">
+                Bienvenue sur votre tableau de bord AI Restaurant
+              </p>
             </div>
           </div>
+          
+          <Badge 
+            variant={subscription.subscribed ? "default" : "secondary"} 
+            className="px-3 py-1 font-medium"
+          >
+            {getPlanDisplayName(subscription.subscription_tier)}
+          </Badge>
         </div>
-      </header>
 
-      <div className="container mx-auto px-6 py-8">
         {/* Restaurant AI Features */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              🤖 <span>Nouveaux Agents Vocaux IA Restaurant</span>
+        <Card className="card-modern glow-primary">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              <span className="gradient-primary bg-clip-text text-transparent font-bold">
+                Agents Vocaux IA Restaurant
+              </span>
             </CardTitle>
-            <CardDescription>
-              Système complet de réception et traitement des réservations et commandes via agents IA
+            <CardDescription className="text-base">
+              Système complet de réception et traitement automatisé des réservations et commandes
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               <Link to="/restaurant-dashboard">
-                <Button className="w-full justify-start h-auto p-4" variant="outline">
-                  <ChefHat className="h-6 w-6 mr-3" />
-                  <div className="text-left">
-                    <div className="font-semibold">Dashboard Restaurant</div>
-                    <div className="text-sm text-muted-foreground">
-                      Gérer les réservations et commandes IA en temps réel
+                <Card className="group hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer border border-primary/20 hover:border-primary/40">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <ChefHat className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                          Dashboard Restaurant
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          Gérer les réservations et commandes IA
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Button>
+                  </CardContent>
+                </Card>
               </Link>
+              
               <Link to="/menu-management">
-                <Button className="w-full justify-start h-auto p-4" variant="outline">
-                  <Book className="h-6 w-6 mr-3" />
-                  <div className="text-left">
-                    <div className="font-semibold">Gestion du Menu</div>
-                    <div className="text-sm text-muted-foreground">
-                      Configurer les plats et prix pour l'agent IA
+                <Card className="group hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer border border-primary/20 hover:border-primary/40">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Book className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                          Gestion du Menu
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          Configurer les plats et prix
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Button>
+                  </CardContent>
+                </Card>
               </Link>
             </div>
           </CardContent>
@@ -139,16 +116,22 @@ const Dashboard = () => {
         <StatsCards />
 
         {/* Main Dashboard */}
-        <div className="mt-8">
+        <div className="space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <div className="flex items-center justify-between">
-              <TabsList className="grid w-fit grid-cols-2 bg-muted/50">
-                <TabsTrigger value="reservations" className="flex items-center space-x-2">
+              <TabsList className="grid w-fit grid-cols-2 bg-card/50 backdrop-blur-sm border border-border/50">
+                <TabsTrigger 
+                  value="reservations" 
+                  className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
                   <Calendar className="h-4 w-4" />
                   <span>Réservations</span>
                 </TabsTrigger>
-                <TabsTrigger value="orders" className="flex items-center space-x-2">
-                  <UtensilsCrossed className="h-4 w-4" />
+                <TabsTrigger 
+                  value="orders" 
+                  className="flex items-center space-x-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <ChefHat className="h-4 w-4" />
                   <span>Commandes</span>
                 </TabsTrigger>
               </TabsList>
@@ -160,10 +143,10 @@ const Dashboard = () => {
                     placeholder="Rechercher..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 w-64"
+                    className="pl-10 w-64 bg-card/50 backdrop-blur-sm border-border/50"
                   />
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="bg-card/50 backdrop-blur-sm border-border/50">
                   <Filter className="h-4 w-4 mr-2" />
                   Filtres
                 </Button>
@@ -180,7 +163,7 @@ const Dashboard = () => {
           </Tabs>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 
