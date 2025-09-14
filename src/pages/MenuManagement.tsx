@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Plus, Trash2, Edit, ArrowLeft, ChefHat } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface MenuItem {
   id: string;
@@ -22,6 +23,7 @@ interface MenuItem {
 
 export default function MenuManagement() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -165,6 +167,26 @@ export default function MenuManagement() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {/* Navigation Header */}
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour au Dashboard
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/restaurant-dashboard')}
+          className="flex items-center gap-2"
+        >
+          <ChefHat className="h-4 w-4" />
+          Dashboard Restaurant
+        </Button>
+      </div>
+      
       <h1 className="text-3xl font-bold">Gestion du Menu</h1>
 
       <div className="grid lg:grid-cols-3 gap-6">

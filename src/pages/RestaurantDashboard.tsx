@@ -8,8 +8,9 @@ import { CommandeCard } from "@/components/restaurant/CommandeCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Bell } from "lucide-react";
+import { RefreshCw, Bell, ArrowLeft, Book } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface Reservation {
   id: string;
@@ -48,6 +49,7 @@ interface Stats {
 
 export default function RestaurantDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [commandes, setCommandes] = useState<Commande[]>([]);
   const [stats, setStats] = useState<Stats>({
@@ -138,6 +140,26 @@ export default function RestaurantDashboard() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      {/* Navigation Header */}
+      <div className="flex items-center gap-4 mb-6">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour au Dashboard
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/menu-management')}
+          className="flex items-center gap-2"
+        >
+          <Book className="h-4 w-4" />
+          Gestion du Menu
+        </Button>
+      </div>
+      
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard Restaurant</h1>
         <div className="flex items-center gap-2">
