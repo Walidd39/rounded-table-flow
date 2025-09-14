@@ -149,7 +149,10 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
             <DropdownMenuContent align="end" className="w-56 bg-background border shadow-lg z-50">
               {hasNextStatus && 'nextStatus' in config && (
                 <DropdownMenuItem 
-                  onClick={() => updateStatus(config.nextStatus)}
+                  onClick={() => {
+                    console.log('🖱️ Dropdown item clicked!', { nextStatus: config.nextStatus });
+                    updateStatus(config.nextStatus);
+                  }}
                   className="flex items-center gap-2 text-primary hover:text-primary"
                 >
                   <CheckCircle className="h-4 w-4" />
@@ -176,7 +179,10 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
         {hasNextStatus && 'nextStatus' in config && (
           <div className="pt-4 border-t border-border/50">
             <Button
-              onClick={() => updateStatus(config.nextStatus)}
+              onClick={() => {
+                console.log('🖱️ Main button clicked!', { nextStatus: config.nextStatus });
+                updateStatus(config.nextStatus);
+              }}
               disabled={isUpdating}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium btn-glow"
             >

@@ -138,7 +138,10 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
               <DropdownMenuContent align="end" className="w-48 bg-background border shadow-lg z-50">
                 {reservation.statut === 'confirmee' && (
                   <DropdownMenuItem 
-                    onClick={() => updateStatus('arrivee')}
+                    onClick={() => {
+                      console.log('🖱️ Reservation dropdown clicked - Arrivée!');
+                      updateStatus('arrivee');
+                    }}
                     className="flex items-center gap-2 text-success hover:text-success"
                   >
                     <Check className="h-4 w-4" />
@@ -147,7 +150,10 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
                 )}
                 {reservation.statut !== 'annulee' && (
                   <DropdownMenuItem 
-                    onClick={() => updateStatus('annulee')}
+                    onClick={() => {
+                      console.log('🖱️ Reservation dropdown clicked - Annulée!');
+                      updateStatus('annulee');
+                    }}
                     className="flex items-center gap-2 text-destructive hover:text-destructive"
                   >
                     <X className="h-4 w-4" />
