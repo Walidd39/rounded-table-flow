@@ -4,12 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter, Settings, User, CreditCard, Zap } from "lucide-react";
+import { Bell, Calendar, Clock, Users, UtensilsCrossed, Phone, Search, Filter, Settings, User, CreditCard, Zap, ChefHat, Book } from "lucide-react";
 import { ReservationsTable } from "@/components/dashboard/ReservationsTable";
 import { OrdersTable } from "@/components/dashboard/OrdersTable";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 
 const Dashboard = () => {
@@ -97,6 +97,44 @@ const Dashboard = () => {
       </header>
 
       <div className="container mx-auto px-6 py-8">
+        {/* Restaurant AI Features */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              🤖 <span>Nouveaux Agents Vocaux IA Restaurant</span>
+            </CardTitle>
+            <CardDescription>
+              Système complet de réception et traitement des réservations et commandes via agents IA
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Link to="/restaurant-dashboard">
+                <Button className="w-full justify-start h-auto p-4" variant="outline">
+                  <ChefHat className="h-6 w-6 mr-3" />
+                  <div className="text-left">
+                    <div className="font-semibold">Dashboard Restaurant</div>
+                    <div className="text-sm text-muted-foreground">
+                      Gérer les réservations et commandes IA en temps réel
+                    </div>
+                  </div>
+                </Button>
+              </Link>
+              <Link to="/menu-management">
+                <Button className="w-full justify-start h-auto p-4" variant="outline">
+                  <Book className="h-6 w-6 mr-3" />
+                  <div className="text-left">
+                    <div className="font-semibold">Gestion du Menu</div>
+                    <div className="text-sm text-muted-foreground">
+                      Configurer les plats et prix pour l'agent IA
+                    </div>
+                  </div>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Stats Cards */}
         <StatsCards />
 
