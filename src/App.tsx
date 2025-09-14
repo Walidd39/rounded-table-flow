@@ -16,6 +16,10 @@ import MinutesRecharge from "./pages/MinutesRecharge";
 import AdminDashboard from "./pages/AdminDashboard";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import MenuManagement from "./pages/MenuManagement";
+import Reservations from "./pages/Reservations";
+import Orders from "./pages/Orders";
+import Notifications from "./pages/Notifications";
+import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -118,12 +122,32 @@ const App = () => (
                   <RestaurantDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/menu-management" element={
-                <ProtectedRoute>
-                  <MenuManagement />
-                </ProtectedRoute>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+               <Route path="/menu-management" element={
+                 <ProtectedRoute>
+                   <MenuManagement />
+                 </ProtectedRoute>
+               } />
+               <Route path="/reservations" element={
+                 <ProtectedRoute>
+                   <Reservations />
+                 </ProtectedRoute>
+               } />
+               <Route path="/orders" element={
+                 <ProtectedRoute>
+                   <Orders />
+                 </ProtectedRoute>
+               } />
+               <Route path="/notifications" element={
+                 <ProtectedRoute>
+                   <Notifications />
+                 </ProtectedRoute>
+               } />
+               <Route path="/help" element={
+                 <ProtectedRoute>
+                   <Help />
+                 </ProtectedRoute>
+               } />
+               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
