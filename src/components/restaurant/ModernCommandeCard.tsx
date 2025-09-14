@@ -125,25 +125,31 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
                 <Euro className="h-3 w-3 mr-1" />
                 {commande.montant_total.toFixed(2)}€
               </Badge>
-              <Badge 
-                variant={config.variant}
-                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity ${
-                  hasNextStatus ? 'hover:scale-105' : ''
-                }`}
-                onClick={() => {
-                  if (hasNextStatus && 'nextStatus' in config) {
-                    console.log('🖱️ Status badge clicked!', { currentStatus: commande.statut, nextStatus: config.nextStatus });
+              
+              {hasNextStatus && 'nextStatus' in config ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    console.log('🖱️ Status button clicked!', { currentStatus: commande.statut, nextStatus: config.nextStatus });
                     updateStatus(config.nextStatus);
-                  }
-                }}
-                title={hasNextStatus && 'nextStatus' in config ? `Cliquer pour ${config.nextLabel.toLowerCase()}` : undefined}
-              >
-                <StatusIcon className="h-3 w-3" />
-                {config.label}
-                {hasNextStatus && 'nextStatus' in config && (
+                  }}
+                  className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80`}
+                  disabled={isUpdating}
+                >
+                  <StatusIcon className="h-3 w-3" />
+                  {config.label}
                   <span className="ml-1 text-xs opacity-70">→</span>
-                )}
-              </Badge>
+                </Button>
+              ) : (
+                <Badge 
+                  variant={config.variant}
+                  className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1`}
+                >
+                  <StatusIcon className="h-3 w-3" />
+                  {config.label}
+                </Badge>
+              )}
             </div>
           </div>
 
