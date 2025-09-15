@@ -33,10 +33,10 @@ const statusConfig = {
     bg: "bg-muted", 
     icon: CircleDot,
     color: "text-muted-foreground",
-    nextStatus: "preparation" as const,
+    nextStatus: "en_preparation" as const,
     nextLabel: "Commencer la préparation"
   },
-  preparation: { 
+  en_preparation: { 
     label: "En préparation", 
     variant: "default" as const, 
     bg: "bg-warning/10", 
