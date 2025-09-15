@@ -24,7 +24,7 @@ interface Reservation {
 
 interface ModernReservationCardProps {
   reservation: Reservation;
-  onUpdate: () => void;
+  onUpdate: (reservationId: string, newStatus: string) => void;
 }
 
 const statusConfig = {
@@ -84,7 +84,7 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
 
       console.log('✅ Update successful:', data);
       toast.success(`Statut mis à jour: ${statusConfig[newStatus as keyof typeof statusConfig]?.label}`);
-      onUpdate();
+      onUpdate(reservation.id, newStatus);
     } catch (error) {
       console.error('💥 Unexpected error:', error);
       toast.error("Erreur lors de la mise à jour");

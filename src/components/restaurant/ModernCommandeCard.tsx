@@ -23,7 +23,7 @@ interface Commande {
 
 interface ModernCommandeCardProps {
   commande: Commande;
-  onUpdate: () => void;
+  onUpdate: (commandeId: string, newStatus: string) => void;
 }
 
 const statusConfig = {
@@ -96,7 +96,7 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
 
       console.log('✅ Update successful:', data);
       toast.success(`Statut mis à jour: ${statusConfig[newStatus as keyof typeof statusConfig]?.label}`);
-      onUpdate();
+      onUpdate(commande.id, newStatus);
     } catch (error) {
       console.error('💥 Unexpected error:', error);
       toast.error("Erreur lors de la mise à jour");

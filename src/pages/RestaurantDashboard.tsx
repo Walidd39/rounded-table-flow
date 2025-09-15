@@ -125,6 +125,28 @@ export default function RestaurantDashboard() {
     }
   };
 
+  // Update individual reservation status
+  const updateReservationStatus = (reservationId: string, newStatus: string) => {
+    setReservations(prev => 
+      prev.map(reservation => 
+        reservation.id === reservationId 
+          ? { ...reservation, statut: newStatus }
+          : reservation
+      )
+    );
+  };
+
+  // Update individual order status
+  const updateCommandeStatus = (commandeId: string, newStatus: string) => {
+    setCommandes(prev => 
+      prev.map(commande => 
+        commande.id === commandeId 
+          ? { ...commande, statut: newStatus }
+          : commande
+      )
+    );
+  };
+
   useEffect(() => {
     fetchData();
     
@@ -227,7 +249,7 @@ export default function RestaurantDashboard() {
                   <ModernReservationCard 
                     key={reservation.id} 
                     reservation={reservation} 
-                    onUpdate={fetchData}
+                    onUpdate={updateReservationStatus}
                   />
                 ))
               )}
@@ -264,7 +286,7 @@ export default function RestaurantDashboard() {
                   <ModernCommandeCard 
                     key={commande.id} 
                     commande={commande} 
-                    onUpdate={fetchData}
+                    onUpdate={updateCommandeStatus}
                   />
                 ))
               )}
