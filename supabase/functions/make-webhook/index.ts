@@ -6,18 +6,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/w0oo5ci4at3cpe0a6nhqkccdpqs9a6sl";
-
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[MAKE-WEBHOOK] ${step}${detailsStr}`);
+  console.log(`[MAKE-WEBHOOK-RECEIVER] ${step}${detailsStr}`);
 };
 
-interface WebhookData {
-  type: 'reservation' | 'commande' | 'user_activity' | 'subscription' | 'minutes_usage';
-  data: any;
-  user_id?: string;
-  timestamp?: string;
+interface MakeWebhookData {
+  type_demande?: string; // 'reservation' ou 'commande' 
+  client_nom: string;
+  client_telephone?: string;
+  // Pour les réservations
+  date_reservation?: string;
+  heure_reservation?: string;
+  nombre_personnes?: number;
+  // Pour les commandes  
+  items_commandes?: any[];
+  montant_total?: number;
+  heure_commande?: string;
+  // ID du restaurant
+  restaurant_id: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -39,81 +46,81 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const webhookData: WebhookData = await req.json();
-    logStep("Received webhook data", { type: webhookData.type });
-
-    // Enrich data with timestamp if not provided
-    if (!webhookData.timestamp) {
-      webhookData.timestamp = new Date().toISOString();
-    }
-
-    // Get additional user information if user_id is provided
-    let enrichedData = { ...webhookData };
-    
-    if (webhookData.user_id) {
-      const { data: profile } = await supabaseClient
-        .from('profiles')
-        .select('display_name, minutes_restantes')
-        .eq('user_id', webhookData.user_id)
-        .single();
-
-      if (profile) {
-        enrichedData.user_profile = profile;
-      }
-
-      // Get subscriber info
-      const { data: subscriber } = await supabaseClient
-        .from('subscribers')
-        .select('tier, status')
-        .eq('user_id', webhookData.user_id)
-        .single();
-
-      if (subscriber) {
-        enrichedData.subscription = subscriber;
-      }
-    }
-
-    // Send to Make webhook
-    const makeResponse = await fetch(MAKE_WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(enrichedData),
+    const makeData: MakeWebhookData = await req.json();
+    logStep("Received data from Make", { 
+      type: makeData.type_demande,
+      client: makeData.client_nom 
     });
 
-    if (!makeResponse.ok) {
-      const errorText = await makeResponse.text();
-      logStep("ERROR: Failed to send to Make", { 
-        status: makeResponse.status, 
-        error: errorText 
+    // Traiter les réservations
+    if (makeData.type_demande === "reservation") {
+      const { error: reservationError } = await supabaseClient
+        .from('ai_reservations')
+        .insert({
+          restaurant_id: makeData.restaurant_id,
+          client_nom: makeData.client_nom,
+          client_telephone: makeData.client_telephone,
+          date_reservation: makeData.date_reservation,
+          heure_reservation: makeData.heure_reservation,
+          nombre_personnes: makeData.nombre_personnes,
+          statut: 'confirmee',
+          confirmation: true
+        });
+
+      if (reservationError) {
+        logStep("ERROR: Failed to insert reservation", { error: reservationError });
+        throw new Error(`Failed to create reservation: ${reservationError.message}`);
+      }
+
+      logStep("Reservation created successfully", {
+        client: makeData.client_nom,
+        date: makeData.date_reservation,
+        heure: makeData.heure_reservation
       });
-      throw new Error(`Make webhook failed: ${makeResponse.status} - ${errorText}`);
     }
 
-    logStep("Successfully sent to Make", { 
-      type: webhookData.type,
-      status: makeResponse.status 
-    });
+    // Traiter les commandes
+    if (makeData.type_demande === "commande") {
+      const { error: commandeError } = await supabaseClient
+        .from('ai_commandes')
+        .insert({
+          restaurant_id: makeData.restaurant_id,
+          client_nom: makeData.client_nom,
+          items_commandes: makeData.items_commandes || [],
+          montant_total: makeData.montant_total || 0,
+          heure_commande: makeData.heure_commande,
+          statut: 'recue'
+        });
 
-    // Log the webhook call in database for tracking
+      if (commandeError) {
+        logStep("ERROR: Failed to insert commande", { error: commandeError });
+        throw new Error(`Failed to create commande: ${commandeError.message}`);
+      }
+
+      logStep("Commande created successfully", {
+        client: makeData.client_nom,
+        montant: makeData.montant_total,
+        heure: makeData.heure_commande
+      });
+    }
+
+    // Log the webhook call for tracking
     await supabaseClient
       .from('webhook_logs')
       .insert({
-        webhook_type: 'make',
-        data_type: webhookData.type,
-        user_id: webhookData.user_id,
-        status: 'success',
-        response_status: makeResponse.status
-      })
-      .select()
-      .single();
+        webhook_type: 'make_receiver',
+        data_type: makeData.type_demande,
+        status: 'success'
+      });
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Data sent to Make successfully",
-        type: webhookData.type
+        message: `${makeData.type_demande} created successfully`,
+        data: {
+          type: makeData.type_demande,
+          client: makeData.client_nom
+        }
       }), 
       {
         status: 200,
@@ -122,9 +129,9 @@ const handler = async (req: Request): Promise<Response> => {
     );
 
   } catch (error: any) {
-    logStep("ERROR in make-webhook", { message: error.message });
+    logStep("ERROR in make-webhook-receiver", { message: error.message });
     
-    // Try to log the error in database
+    // Log the error in database
     try {
       const supabaseClient = createClient(
         Deno.env.get("SUPABASE_URL") ?? "",
@@ -134,7 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
       await supabaseClient
         .from('webhook_logs')
         .insert({
-          webhook_type: 'make',
+          webhook_type: 'make_receiver',
           status: 'error',
           error_message: error.message
         });
