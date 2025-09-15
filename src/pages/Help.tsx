@@ -7,15 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { 
   HelpCircle, 
   MessageCircle, 
-  Phone, 
   Mail, 
   Book, 
-  Video,
   Search,
-  ChevronRight,
-  ExternalLink
+  ChevronRight
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const faqItems = [
   {
@@ -50,15 +49,8 @@ const contactMethods = [
     title: "Support par email",
     description: "Contactez notre équipe support par email",
     icon: Mail,
-    contact: "support@votre-domaine.com",
+    contact: "mind.lineai@gmail.com",
     available: "24h/24, 7j/7"
-  },
-  {
-    title: "Support téléphonique",
-    description: "Appelez-nous directement pour une assistance immédiate",
-    icon: Phone,
-    contact: "+33 1 XX XX XX XX",
-    available: "Lun-Ven 9h-18h"
   },
   {
     title: "Chat en direct",
@@ -72,6 +64,13 @@ const contactMethods = [
 export default function Help() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = ["Tous", ...Array.from(new Set(faqItems.map(item => item.category)))];
 
@@ -81,6 +80,27 @@ export default function Help() {
     const matchesCategory = selectedCategory === "Tous" || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-message', {
+        body: contactForm
+      });
+
+      if (error) throw error;
+
+      toast.success("Message envoyé avec succès !");
+      setContactForm({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error("Erreur lors de l'envoi du message");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <AppLayout>
@@ -93,23 +113,13 @@ export default function Help() {
         </div>
 
         {/* Actions rapides */}
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
               <Book className="h-8 w-8 mx-auto mb-3 text-primary" />
               <h3 className="font-semibold mb-2">Guide d'utilisation</h3>
               <p className="text-sm text-muted-foreground">
                 Documentation complète de la plateforme
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <Video className="h-8 w-8 mx-auto mb-3 text-primary" />
-              <h3 className="font-semibold mb-2">Tutoriels vidéo</h3>
-              <p className="text-sm text-muted-foreground">
-                Apprenez avec nos vidéos explicatives
               </p>
             </CardContent>
           </Card>
@@ -196,7 +206,7 @@ export default function Help() {
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               {contactMethods.map((method, index) => (
                 <Card key={index} className="border-dashed">
                   <CardContent className="p-4 text-center">
@@ -211,22 +221,42 @@ export default function Help() {
             </div>
 
             {/* Formulaire de contact */}
-            <div className="border-t pt-6">
+            <form onSubmit={handleContactSubmit} className="border-t pt-6">
               <h4 className="font-semibold mb-4">Envoyer un message</h4>
               <div className="grid md:grid-cols-2 gap-4">
-                <Input placeholder="Votre nom" />
-                <Input placeholder="Votre email" />
+                <Input 
+                  placeholder="Votre nom" 
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                  required
+                />
+                <Input 
+                  placeholder="Votre email" 
+                  type="email"
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                  required
+                />
               </div>
-              <Input placeholder="Sujet" className="mt-4" />
+              <Input 
+                placeholder="Sujet" 
+                className="mt-4" 
+                value={contactForm.subject}
+                onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
+                required
+              />
               <Textarea 
                 placeholder="Décrivez votre problème ou votre question..." 
                 className="mt-4 min-h-[100px]"
+                value={contactForm.message}
+                onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                required
               />
-              <Button className="mt-4">
+              <Button type="submit" className="mt-4" disabled={isSubmitting}>
                 <Mail className="h-4 w-4 mr-2" />
-                Envoyer le message
+                {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
               </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
       </div>
