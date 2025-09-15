@@ -127,8 +127,7 @@ export function AppSidebar() {
           </div>
           {open && (
             <div>
-              <h2 className="text-lg font-bold text-sidebar-foreground">mind.line</h2>
-              <p className="text-xs text-muted-foreground">AI Restaurant SaaS</p>
+              <h2 className="text-lg font-bold text-sidebar-foreground">MINDLINE</h2>
             </div>
           )}
         </div>

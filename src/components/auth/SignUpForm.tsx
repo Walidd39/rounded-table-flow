@@ -64,7 +64,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleMode }) => {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">Créer un compte</CardTitle>
         <CardDescription className="text-center">
-          Rejoignez mind.line dès aujourd'hui
+          Rejoignez MINDLINE dès aujourd'hui
         </CardDescription>
       </CardHeader>
       <CardContent>

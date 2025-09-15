@@ -44,7 +44,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">Connexion</CardTitle>
         <CardDescription className="text-center">
-          Connectez-vous à votre compte mind.line
+          Connectez-vous à votre compte MINDLINE
         </CardDescription>
       </CardHeader>
       <CardContent>

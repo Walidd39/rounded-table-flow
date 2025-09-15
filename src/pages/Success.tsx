@@ -54,7 +54,7 @@ export const Success: React.FC = () => {
             Paiement réussi !
           </CardTitle>
           <CardDescription>
-            Votre abonnement mind.line a été activé avec succès. 
+            Votre abonnement MINDLINE a été activé avec succès. 
             Vous pouvez maintenant profiter de toutes les fonctionnalités de votre plan.
           </CardDescription>
         </CardHeader>
