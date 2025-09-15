@@ -28,7 +28,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email to your support email
     const emailResponse = await resend.emails.send({
       from: "MINDLINE Support <onboarding@resend.dev>",
-      to: ["mind.lineai@gmail.com"],
+      to: ["habibii.walid@gmail.com"],
       subject: `[Support] ${subject}`,
       html: `
         <h2>Nouveau message de support</h2>
