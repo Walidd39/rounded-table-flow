@@ -127,11 +127,17 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  console.log('🖱️ Reservation status button clicked!', { currentStatus: reservation.statut });
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('🖱️ Reservation status button clicked!', { 
+                    currentStatus: reservation.statut,
+                    reservationId: reservation.id,
+                    event: 'status_button_click'
+                  });
                   updateStatus('arrivee');
                 }}
-                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80`}
+                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80 cursor-pointer`}
                 disabled={isUpdating}
               >
                 <StatusIcon className="h-3 w-3" />
@@ -162,8 +168,13 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
               <DropdownMenuContent align="end" className="w-48 bg-background border shadow-lg z-50">
                 {reservation.statut === 'confirmee' && (
                   <DropdownMenuItem 
-                    onClick={() => {
-                      console.log('🖱️ Reservation dropdown clicked - Arrivée!');
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🖱️ Reservation dropdown clicked - Arrivée!', { 
+                        reservationId: reservation.id,
+                        event: 'dropdown_arrivee_click'
+                      });
                       updateStatus('arrivee');
                     }}
                     className="flex items-center gap-2 text-success hover:text-success"
@@ -174,8 +185,13 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
                 )}
                 {reservation.statut !== 'annulee' && (
                   <DropdownMenuItem 
-                    onClick={() => {
-                      console.log('🖱️ Reservation dropdown clicked - Annulée!');
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🖱️ Reservation dropdown clicked - Annulée!', { 
+                        reservationId: reservation.id,
+                        event: 'dropdown_annulee_click'
+                      });
                       updateStatus('annulee');
                     }}
                     className="flex items-center gap-2 text-destructive hover:text-destructive"

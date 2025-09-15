@@ -137,11 +137,18 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    console.log('🖱️ Status button clicked!', { currentStatus: commande.statut, nextStatus: config.nextStatus });
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🖱️ Status button clicked!', { 
+                      currentStatus: commande.statut, 
+                      nextStatus: config.nextStatus,
+                      commandeId: commande.id,
+                      event: 'button_click'
+                    });
                     updateStatus(config.nextStatus);
                   }}
-                  className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80`}
+                  className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80 cursor-pointer`}
                   disabled={isUpdating}
                 >
                   <StatusIcon className="h-3 w-3" />
@@ -174,8 +181,14 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
             <DropdownMenuContent align="end" className="w-56 bg-background border shadow-lg z-50">
               {hasNextStatus && 'nextStatus' in config && (
                 <DropdownMenuItem 
-                  onClick={() => {
-                    console.log('🖱️ Dropdown item clicked!', { nextStatus: config.nextStatus });
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🖱️ Dropdown item clicked!', { 
+                      nextStatus: config.nextStatus,
+                      commandeId: commande.id,
+                      event: 'dropdown_click'
+                    });
                     updateStatus(config.nextStatus);
                   }}
                   className="flex items-center gap-2 text-primary hover:text-primary"
@@ -204,8 +217,14 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
         {hasNextStatus && 'nextStatus' in config && (
           <div className="pt-4 border-t border-border/50">
             <Button
-              onClick={() => {
-                console.log('🖱️ Main button clicked!', { nextStatus: config.nextStatus });
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🖱️ Main button clicked!', { 
+                  nextStatus: config.nextStatus,
+                  commandeId: commande.id,
+                  event: 'main_button_click'
+                });
                 updateStatus(config.nextStatus);
               }}
               disabled={isUpdating}
