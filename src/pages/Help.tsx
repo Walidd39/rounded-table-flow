@@ -8,7 +8,6 @@ import {
   HelpCircle, 
   MessageCircle, 
   Mail, 
-  Book, 
   Search,
   ChevronRight
 } from "lucide-react";
@@ -113,17 +112,7 @@ export default function Help() {
         </div>
 
         {/* Actions rapides */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <Book className="h-8 w-8 mx-auto mb-3 text-primary" />
-              <h3 className="font-semibold mb-2">Guide d'utilisation</h3>
-              <p className="text-sm text-muted-foreground">
-                Documentation complète de la plateforme
-              </p>
-            </CardContent>
-          </Card>
-
+        <div className="grid md:grid-cols-1 gap-4 max-w-md">
           <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
               <MessageCircle className="h-8 w-8 mx-auto mb-3 text-primary" />
