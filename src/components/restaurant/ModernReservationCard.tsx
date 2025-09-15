@@ -128,6 +128,7 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
                 variant="outline"
                 size="sm"
                 onClick={(e) => {
+                  console.log('🚨 RESERVATION BUTTON CLICKED! This message should appear if button works');
                   e.preventDefault();
                   e.stopPropagation();
                   console.log('🖱️ Reservation status button clicked!', { 
@@ -137,7 +138,7 @@ export function ModernReservationCard({ reservation, onUpdate }: ModernReservati
                   });
                   updateStatus('arrivee');
                 }}
-                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80 cursor-pointer`}
+                className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80 cursor-pointer transform hover:scale-105 transition-all`}
                 disabled={isUpdating}
               >
                 <StatusIcon className="h-3 w-3" />

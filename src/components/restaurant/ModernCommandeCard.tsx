@@ -138,6 +138,7 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
                   variant="outline"
                   size="sm"
                   onClick={(e) => {
+                    console.log('🚨 BUTTON CLICKED! This message should appear if button works');
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('🖱️ Status button clicked!', { 
@@ -148,7 +149,7 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
                     });
                     updateStatus(config.nextStatus);
                   }}
-                  className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80 cursor-pointer`}
+                  className={`${config.bg} ${config.color} border-0 font-medium px-3 py-1 flex items-center gap-1 hover:opacity-80 cursor-pointer transform hover:scale-105 transition-all`}
                   disabled={isUpdating}
                 >
                   <StatusIcon className="h-3 w-3" />
@@ -218,6 +219,7 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
           <div className="pt-4 border-t border-border/50">
             <Button
               onClick={(e) => {
+                console.log('🚨 MAIN COMMAND BUTTON CLICKED! This should appear if button works');
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🖱️ Main button clicked!', { 
@@ -228,7 +230,7 @@ export function ModernCommandeCard({ commande, onUpdate }: ModernCommandeCardPro
                 updateStatus(config.nextStatus);
               }}
               disabled={isUpdating}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium btn-glow"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium btn-glow transform hover:scale-105 transition-all"
             >
               {isUpdating ? (
                 <div className="flex items-center gap-2">
