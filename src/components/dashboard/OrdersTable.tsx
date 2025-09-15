@@ -1,182 +1,240 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock, CheckCircle, Package, AlertCircle } from "lucide-react";
+import { Clock, CheckCircle, Package, AlertCircle, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface OrdersTableProps {
   searchQuery: string;
 }
 
+interface Commande {
+  id: string;
+  client_nom: string;
+  heure_commande: string;
+  items_commandes: string[];
+  montant_total: number;
+  statut: string;
+  created_at: string;
+}
+
+const statusConfig = {
+  recue: { 
+    label: "Reçue", 
+    variant: "secondary" as const, 
+    icon: Package,
+    color: "text-muted-foreground",
+    nextStatus: "en_preparation" as const
+  },
+  en_preparation: { 
+    label: "En préparation", 
+    variant: "default" as const, 
+    icon: Clock,
+    color: "text-warning",
+    nextStatus: "prete" as const
+  },
+  prete: { 
+    label: "Prête", 
+    variant: "default" as const, 
+    icon: CheckCircle,
+    color: "text-primary",
+    nextStatus: "livree" as const
+  },
+  livree: { 
+    label: "Livrée", 
+    variant: "default" as const, 
+    icon: CheckCircle,
+    color: "text-success"
+  },
+};
+
 const OrdersTable = ({ searchQuery }: OrdersTableProps) => {
-  const orders = [
-    {
-      id: 1,
-      customerName: "Lucas Bernard",
-      items: ["Menu Terre et Mer", "Dessert Chocolat", "Café"],
-      pickupTime: "12:45",
-      status: "preparing",
-      isNew: true,
-      total: "32.50€",
-    },
-    {
-      id: 2,
-      customerName: "Emma Leroy",
-      items: ["Salade César", "Tarte Tatin"],
-      pickupTime: "13:15",
-      status: "ready",
-      isNew: false,
-      total: "18.90€",
-    },
-    {
-      id: 3,
-      customerName: "Thomas Petit",
-      items: ["Pizza Margherita", "Tiramisu", "Coca Cola"],
-      pickupTime: "13:30",
-      status: "preparing",
-      isNew: true,
-      total: "24.80€",
-    },
-    {
-      id: 4,
-      customerName: "Céline Moreau",
-      items: ["Plat du Jour", "Vin Blanc"],
-      pickupTime: "14:00",
-      status: "completed",
-      isNew: false,
-      total: "26.70€",
-    },
-    {
-      id: 5,
-      customerName: "Antoine Garcia",
-      items: ["Burger Maison", "Frites", "Bière"],
-      pickupTime: "12:30",
-      status: "delayed",
-      isNew: false,
-      total: "19.50€",
-    },
-  ];
+  const { user } = useAuth();
+  const [commandes, setCommandes] = useState<Commande[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
 
-  const filteredOrders = orders.filter(order =>
-    order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    order.items.some(item => item.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const fetchCommandes = async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('ai_commandes')
+        .select('*')
+        .eq('restaurant_id', user.id)
+        .order('created_at', { ascending: false });
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "preparing":
-        return (
-          <Badge className="bg-warning/10 text-warning border-warning/20">
-            <Clock className="h-3 w-3 mr-1" />
-            En préparation
-          </Badge>
-        );
-      case "ready":
-        return (
-          <Badge className="bg-success/10 text-success border-success/20">
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Prête
-          </Badge>
-        );
-      case "completed":
-        return (
-          <Badge className="bg-muted text-muted-foreground border-muted">
-            <Package className="h-3 w-3 mr-1" />
-            Récupérée
-          </Badge>
-        );
-      case "delayed":
-        return (
-          <Badge className="bg-destructive/10 text-destructive border-destructive/20">
-            <AlertCircle className="h-3 w-3 mr-1" />
-            En retard
-          </Badge>
-        );
-      default:
-        return null;
+      if (error) {
+        console.error('Error fetching orders:', error);
+        toast.error("Erreur lors du chargement des commandes");
+        return;
+      }
+
+      // Transform data to proper format
+      const transformedData: Commande[] = data?.map((cmd: any) => ({
+        ...cmd,
+        items_commandes: Array.isArray(cmd.items_commandes) ? cmd.items_commandes : []
+      })) || [];
+
+      setCommandes(transformedData);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast.error("Erreur lors du chargement des commandes");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const updateStatus = async (commandeId: string, newStatus: string) => {
+    setUpdating(commandeId);
+    
+    try {
+      const { error } = await supabase
+        .from('ai_commandes')
+        .update({ statut: newStatus })
+        .eq('id', commandeId);
+
+      if (error) {
+        console.error('Error updating status:', error);
+        toast.error("Erreur lors de la mise à jour du statut");
+        return;
+      }
+
+      toast.success(`Statut mis à jour: ${statusConfig[newStatus as keyof typeof statusConfig]?.label}`);
+      fetchCommandes(); // Refresh data
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error("Erreur lors de la mise à jour");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchCommandes();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchCommandes, 30000);
+    
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
+  const filteredCommandes = commandes.filter(commande =>
+    commande.client_nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    commande.items_commandes.some(item => 
+      item.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
+  const getStatusBadge = (statut: string) => {
+    const config = statusConfig[statut as keyof typeof statusConfig] || statusConfig.recue;
+    const StatusIcon = config.icon;
+    
+    return (
+      <Badge variant={config.variant} className="flex items-center gap-1">
+        <StatusIcon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
   return (
-    <Card className="shadow-soft">
-      <CardHeader>
+    <Card className="card-modern">
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center space-x-2">
           <span>Commandes</span>
-          <Badge variant="secondary">{filteredOrders.length}</Badge>
+          <Badge variant="secondary">{filteredCommandes.length}</Badge>
         </CardTitle>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={fetchCommandes}
+          className="bg-card/50 backdrop-blur-sm border-border/50"
+        >
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Actualiser
+        </Button>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Client</TableHead>
-              <TableHead>Commande</TableHead>
-              <TableHead>Heure Récupération</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredOrders.map((order) => (
-              <TableRow 
-                key={order.id} 
-                className={`${
-                  order.isNew 
-                    ? 'bg-accent/50 border-l-4 border-l-primary' 
-                    : ''
-                }`}
-              >
-                <TableCell className="font-medium">
-                  <div className="flex items-center space-x-2">
-                    <span>{order.customerName}</span>
-                    {order.isNew && (
-                      <Badge variant="default" className="text-xs px-2 py-0">
-                        Nouveau
-                      </Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="space-y-1">
-                    {order.items.map((item, index) => (
-                      <div key={index} className="text-sm">
-                        • {item}
-                      </div>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{order.pickupTime}</span>
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium text-primary">
-                  {order.total}
-                </TableCell>
-                <TableCell>{getStatusBadge(order.status)}</TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-2">
-                    {order.status === "preparing" && (
-                      <Button size="sm" className="bg-success hover:bg-success/90">
-                        Marquer Prête
-                      </Button>
-                    )}
-                    {order.status === "ready" && (
-                      <Button size="sm" variant="outline">
-                        Récupérée
-                      </Button>
-                    )}
-                    <Button variant="outline" size="sm">
-                      Détails
-                    </Button>
-                  </div>
-                </TableCell>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span className="text-muted-foreground">Chargement des commandes...</span>
+            </div>
+          </div>
+        ) : filteredCommandes.length === 0 ? (
+          <div className="text-center py-12">
+            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
+              {searchQuery ? 'Aucune commande ne correspond à votre recherche' : 'Aucune commande trouvée'}
+            </p>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Client</TableHead>
+                <TableHead>Articles</TableHead>
+                <TableHead>Heure</TableHead>
+                <TableHead>Montant</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredCommandes.map((commande) => {
+                const config = statusConfig[commande.statut as keyof typeof statusConfig] || statusConfig.recue;
+                const hasNextStatus = 'nextStatus' in config;
+                
+                return (
+                  <TableRow key={commande.id}>
+                    <TableCell className="font-medium">{commande.client_nom}</TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {commande.items_commandes.slice(0, 2).map((item, index) => (
+                          <div key={index} className="text-sm text-muted-foreground">
+                            • {item}
+                          </div>
+                        ))}
+                        {commande.items_commandes.length > 2 && (
+                          <div className="text-xs text-muted-foreground">
+                            +{commande.items_commandes.length - 2} autres
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{commande.heure_commande}</TableCell>
+                    <TableCell className="font-medium">{commande.montant_total.toFixed(2)}€</TableCell>
+                    <TableCell>{getStatusBadge(commande.statut)}</TableCell>
+                    <TableCell>
+                      {hasNextStatus && 'nextStatus' in config && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateStatus(commande.id, config.nextStatus)}
+                          disabled={updating === commande.id}
+                          className="h-8"
+                        >
+                          {updating === commande.id ? (
+                            <div className="h-3 w-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <>Passer à "{statusConfig[config.nextStatus]?.label}"</>
+                          )}
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   );
