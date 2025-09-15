@@ -523,6 +523,42 @@ export type Database = {
           },
         ]
       }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          data_type: string | null
+          error_message: string | null
+          id: string
+          response_status: number | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string
+          data_type?: string | null
+          error_message?: string | null
+          id?: string
+          response_status?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string
+          data_type?: string | null
+          error_message?: string | null
+          id?: string
+          response_status?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          webhook_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
