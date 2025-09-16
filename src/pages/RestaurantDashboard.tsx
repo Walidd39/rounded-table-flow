@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Bell, ArrowLeft, Book } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 
 interface Reservation {
   id: string;
@@ -146,6 +147,34 @@ export default function RestaurantDashboard() {
       )
     );
   };
+
+  // Configuration des mises à jour temps réel
+  useRealtimeUpdates({
+    onNewReservation: (newReservation) => {
+      toast.success(`Nouvelle réservation de ${newReservation.client_nom}!`);
+      setReservations(prev => [...prev, newReservation]);
+      setStats(prev => ({ ...prev, reservations_today: prev.reservations_today + 1 }));
+    },
+    onNewCommande: (newCommande) => {
+      const formattedCommande = {
+        ...newCommande,
+        items_commandes: Array.isArray(newCommande.items_commandes) ? newCommande.items_commandes : []
+      };
+      toast.success(`Nouvelle commande de ${newCommande.client_nom}!`);
+      setCommandes(prev => [...prev, formattedCommande]);
+      setStats(prev => ({ 
+        ...prev, 
+        commandes_today: prev.commandes_today + 1,
+        ca_today: prev.ca_today + parseFloat(newCommande.montant_total.toString())
+      }));
+    },
+    onReservationUpdate: (updatedReservation) => {
+      updateReservationStatus(updatedReservation.id, updatedReservation.statut);
+    },
+    onCommandeUpdate: (updatedCommande) => {
+      updateCommandeStatus(updatedCommande.id, updatedCommande.statut);
+    }
+  });
 
   useEffect(() => {
     fetchData();

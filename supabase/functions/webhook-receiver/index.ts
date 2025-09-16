@@ -9,7 +9,8 @@ const corsHeaders = {
 interface WebhookData {
   type_demande1?: string;
   type_demande2?: string;
-  restaurant_id: string;
+  restaurant_id?: string; // Support ancien format
+  user_id?: string; // Nouveau format recommandé
   Nom: string;
   Telephone?: string;
   Date?: string;
@@ -41,10 +42,46 @@ serve(async (req) => {
     const data: WebhookData = await req.json();
     console.log('Received webhook data:', data);
 
+    // Récupérer l'ID utilisateur (nouveau format user_id ou ancien restaurant_id)
+    const userId = data.user_id || data.restaurant_id;
+    
+    if (!userId) {
+      console.error('Missing user_id or restaurant_id in webhook data');
+      return new Response(JSON.stringify({ error: 'user_id ou restaurant_id manquant' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Vérifier que l'utilisateur existe
+    const { data: userProfile, error: userError } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (userError) {
+      console.error('Error checking user:', userError);
+      return new Response(JSON.stringify({ error: 'Erreur lors de la vérification utilisateur' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!userProfile) {
+      console.error('User not found:', userId);
+      return new Response(JSON.stringify({ error: 'Utilisateur non trouvé' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Processing webhook for user:', userId);
+
     // Traitement RÉSERVATIONS
     if (data.type_demande1 === "reservation") {
       const reservationData = {
-        restaurant_id: data.restaurant_id,
+        restaurant_id: userId,
         client_nom: data.Nom,
         client_telephone: data.Telephone,
         date_reservation: data.Date,
@@ -76,7 +113,7 @@ serve(async (req) => {
           const { data: prixData, error: prixError } = await supabase
             .from('menus_prix')
             .select('prix')
-            .eq('restaurant_id', data.restaurant_id)
+            .eq('restaurant_id', userId)
             .eq('nom_plat', plat)
             .maybeSingle();
 
@@ -87,7 +124,7 @@ serve(async (req) => {
       }
 
       const commandeData = {
-        restaurant_id: data.restaurant_id,
+        restaurant_id: userId,
         client_nom: data.Nom,
         heure_commande: data.Heure,
         items_commandes: data.Choix_menu || [],
@@ -107,7 +144,11 @@ serve(async (req) => {
       console.log('Order inserted successfully');
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ 
+      success: true,
+      message: `Données enregistrées pour utilisateur ${userId}`,
+      user_id: userId
+    }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

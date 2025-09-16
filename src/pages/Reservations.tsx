@@ -8,6 +8,7 @@ import { Calendar, Clock, Users, Phone, Search, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 
 interface Reservation {
   id: string;
@@ -25,6 +26,23 @@ export default function Reservations() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+
+  // Configuration des mises à jour temps réel
+  useRealtimeUpdates({
+    onNewReservation: (newReservation) => {
+      toast.success(`Nouvelle réservation de ${newReservation.client_nom}!`);
+      setReservations(prev => [newReservation, ...prev]);
+    },
+    onReservationUpdate: (updatedReservation) => {
+      setReservations(prev => 
+        prev.map(reservation => 
+          reservation.id === updatedReservation.id 
+            ? updatedReservation
+            : reservation
+        )
+      );
+    }
+  });
 
   const fetchReservations = async () => {
     try {

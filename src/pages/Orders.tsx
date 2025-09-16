@@ -8,6 +8,7 @@ import { ShoppingBag, Clock, Euro, Search, RefreshCw, Package } from "lucide-rea
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 
 interface Commande {
   id: string;
@@ -24,6 +25,23 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+
+  // Configuration des mises à jour temps réel
+  useRealtimeUpdates({
+    onNewCommande: (newCommande) => {
+      toast.success(`Nouvelle commande de ${newCommande.client_nom}!`);
+      setCommandes(prev => [newCommande, ...prev]);
+    },
+    onCommandeUpdate: (updatedCommande) => {
+      setCommandes(prev => 
+        prev.map(commande => 
+          commande.id === updatedCommande.id 
+            ? updatedCommande
+            : commande
+        )
+      );
+    }
+  });
 
   const fetchCommandes = async () => {
     try {
